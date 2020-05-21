@@ -7,7 +7,7 @@ def calc(a, b, disc, plmi):
     numerator2 = _eval_if_intargs(*numerator)
     frac = _eval_if_intargs('/', numerator2, denom2)
     return (
-        ('substitute abc', ('/', numerator, denom)),
+        ('substitute a, b, disc', ('/', numerator, denom)),
         ('eval_denominator', ('/', numerator, denom2)),
         ('eval_numerator', ('/', numerator2, denom2)),
         ('eval_frac', frac),

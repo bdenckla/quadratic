@@ -1,9 +1,7 @@
-import my_print_helpers
+import my_html_helper
 
-my_print_helpers.print_steps_for_disc_and_qroots(2, 4, 1)
-print()
-print()
-my_print_helpers.print_steps_for_disc_and_qroots(2, 5, 1)
-print()
-print()
-my_print_helpers.print_steps_for_disc_and_qroots(7, 8, 1)
+wh = my_html_helper.write_html_file_for_disc_and_qroots
+
+wh(2, 4, 1)
+wh(2, 5, 1)
+wh(7, 8, 1)

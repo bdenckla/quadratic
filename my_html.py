@@ -1,7 +1,7 @@
 import html
 
-def write_to_html(path, title, steps):
-    html_el = _html_el2(title, _render_steps(steps))
+def write_to_html(path, title, calcs, calc_titles):
+    html_el = _html_el2(title, _render_calcs(calcs, calc_titles))
     _write_html_to_file(html_el, path)
 
 
@@ -26,7 +26,11 @@ def _html_el1(attr, contents):
 def _el_to_str(el):
     if isinstance(el, str):
         return html.escape(el)
-    contents = ''.join(map(_el_to_str, el.get('contents', tuple())))
+    elcont = el.get('contents', tuple())
+    if isinstance(elcont, dict) and elcont.get('tag'):
+        contents = _el_to_str(elcont)
+    else:
+        contents = ''.join(map(_el_to_str, elcont))
     lb2 = el.get('lb2', '\n')
     fields = {
         'tag_name': el['tag'],
@@ -88,14 +92,32 @@ def _mo(contents):
     return {'tag': 'mo', 'contents': contents}
 
 
+def _mfrac(contents):
+    return {'tag': 'mfrac', 'contents': contents}
+
+
+def _mrow(contents):
+    return {'tag': 'mrow', 'contents': contents}
+
+
+def _render_calcs(calcs, calc_titles):
+    return tuple(map(_render_calc, calcs, calc_titles))
+
+
+def _render_calc(calc_steps, calc_title):
+    para_of_title = _para(calc_title)
+    table_of_steps = _table(tuple(map(_render_step, calc_steps)))
+    return _div((para_of_title, table_of_steps))
+
+
 def _render_steps(steps):
-    return tuple(map(_render_step, steps))
+    return _table(tuple(map(_render_step, steps)))
 
 
 def _render_step(step):
-    expr = step[1]
-    inside = _render_inside(expr)
-    return _para((_math(inside),))
+    explanation, math_expr = step
+    inside = _render_inside(math_expr)
+    return _tr((_td(_math(inside)), _td(explanation)))
 
 
 def _render_inside(expr):
@@ -105,5 +127,10 @@ def _render_inside(expr):
     if first == 'sqrt':
         return (_msqrt(_render_inside(expr[1])),)
     if first in ('+', '-', '*'):
-        return _render_inside(expr[1]) + (_mo((first,)),) + _render_inside(expr[2])
+        if len(expr) == 3:
+            return _render_inside(expr[1]) + (_mo((first,)),) + _render_inside(expr[2])
+        if len(expr) == 4:
+            return _render_inside(expr[1]) + (_mo((first,)),) + _render_inside(expr[2]) + (_mo((first,)),) + _render_inside(expr[3])
+    if first == '/':
+        return (_mfrac((_mrow(_render_inside(expr[1])), _mrow(_render_inside(expr[2])))),)
     return (_pre((str(expr),)),)
