@@ -120,6 +120,13 @@ def _render_step(step):
     return _tr((_td(_math(inside)), _td(explanation)))
 
 
+_NICE_OPSTR = {
+    '+': '+',
+    '-': '-',
+    '*': '\N{MULTIPLICATION SIGN}',
+}
+
+
 def _render_inside(expr):
     if isinstance(expr, int):
         return (_mn((str(expr),)),)
@@ -127,10 +134,11 @@ def _render_inside(expr):
     if first == 'sqrt':
         return (_msqrt(_render_inside(expr[1])),)
     if first in ('+', '-', '*'):
+        nfirst = _NICE_OPSTR[first]
         if len(expr) == 3:
-            return _render_inside(expr[1]) + (_mo((first,)),) + _render_inside(expr[2])
+            return _render_inside(expr[1]) + (_mo((nfirst,)),) + _render_inside(expr[2])
         if len(expr) == 4:
-            return _render_inside(expr[1]) + (_mo((first,)),) + _render_inside(expr[2]) + (_mo((first,)),) + _render_inside(expr[3])
+            return _render_inside(expr[1]) + (_mo((nfirst,)),) + _render_inside(expr[2]) + (_mo((nfirst,)),) + _render_inside(expr[3])
     if first == '/':
         return (_mfrac((_mrow(_render_inside(expr[1])), _mrow(_render_inside(expr[2])))),)
     return (_pre((str(expr),)),)
