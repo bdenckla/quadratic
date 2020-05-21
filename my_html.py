@@ -1,0 +1,109 @@
+import html
+
+def write_to_html(path, title, steps):
+    html_el = _html_el2(title, _render_steps(steps))
+    _write_html_to_file(html_el, path)
+
+
+def _write_html_to_file(html_el, path):
+    with open(path, 'w', encoding='utf-8') as fh:
+        fh.write('<!doctype html>\n')
+        fh.write(_el_to_str(html_el))
+
+
+def _html_el2(title_text, body_contents, lang='en', charset='utf-8'):
+    meta = {'tag': 'meta', 'noclose': True}
+    title = {'tag': 'title', 'contents': (title_text,)}
+    _head = {'tag': 'head', 'contents': (meta, title)}
+    _body = {'tag': 'body', 'contents': body_contents}
+    return _html_el1({'lang': lang}, (_head, _body))
+
+
+def _html_el1(attr, contents):
+    return {'tag': 'html', 'attr': attr, 'contents': contents}
+
+
+def _el_to_str(el):
+    if isinstance(el, str):
+        return html.escape(el)
+    contents = ''.join(map(_el_to_str, el.get('contents', tuple())))
+    lb2 = el.get('lb2', '\n')
+    fields = {
+        'tag_name': el['tag'],
+        'attr': _attr_str(el.get('attr')),
+        'contents': contents,
+        'close': '</{}>{}'.format(el['tag'], lb2),
+        'lb1': el.get('lb1', '\n'),
+    }
+    return '<{tag_name}{attr}>{lb1}{contents}{close}'.format(**fields)
+
+
+def _attr_str(attr_dict):
+    if not attr_dict:
+        return ''
+    return ' ' + ' '.join(map(_kv_str, attr_dict.items()))
+
+
+def _kv_str(kv):
+    return '{}="{}"'.format(kv[0], html.escape(kv[1], quote=True))
+
+
+def _para(contents):
+    return {'tag': 'p', 'contents': contents, 'lb1': ''}
+
+
+def _tr(contents):
+    return {'tag': 'tr', 'contents': contents, 'lb1': ''}
+
+
+def _td(contents):
+    return {'tag': 'td', 'contents': contents, 'lb1': '', 'lb2': ''}
+
+
+def _table(contents):
+    return {'tag': 'table', 'contents': contents}
+
+
+def _div(contents):
+    return {'tag': 'div', 'contents': contents}
+
+
+def _pre(contents):
+    return {'tag': 'pre', 'contents': contents}
+
+
+def _math(contents):
+    return {'tag': 'math', 'contents': contents}
+
+
+def _msqrt(contents):
+    return {'tag': 'msqrt', 'contents': contents}
+
+
+def _mn(contents):
+    return {'tag': 'mn', 'contents': contents}
+
+
+def _mo(contents):
+    return {'tag': 'mo', 'contents': contents}
+
+
+def _render_steps(steps):
+    return tuple(map(_render_step, steps))
+
+
+def _render_step(step):
+    expr = step[1]
+    inside = _render_inside(expr)
+    return _para((_math(inside),))
+
+
+def _render_inside(expr):
+    if isinstance(expr, int):
+        return (_mn((str(expr),)),)
+    first = expr[0]
+    if first == 'sqrt':
+        return (_msqrt(_render_inside(expr[1])),)
+    if first in ('+', '-', '*'):
+        return _render_inside(expr[1]) + (_mo((first,)),) + _render_inside(expr[2])
+    return (_pre((str(expr),)),)
