@@ -1,5 +1,6 @@
 import html
 
+
 def write_to_html(path, title, calcs, calc_titles):
     html_el = _html_el2(title, _render_calcs(calcs, calc_titles))
     _write_html_to_file(html_el, path)

@@ -14,6 +14,7 @@ def calc(a, b, c):
         ('evict squares', _move_squares_out(sub3)),
     )
 
+
 _SQRT_SEP = {
     8: (2, 2),  # 8 = 2*sqrt(2)
     16: (4, 1),  # 8 = 4*sqrt(1)
