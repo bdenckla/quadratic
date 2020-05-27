@@ -1,4 +1,5 @@
 import my_operators
+import my_primefac as pf
 
 
 def calc(a, b, c):
@@ -15,15 +16,26 @@ def calc(a, b, c):
     )
 
 
-_SQRT_SEP = {
-    8: (2, 2),  # 8 = 2*sqrt(2)
-    16: (4, 1),  # 8 = 4*sqrt(1)
-    36: (6, 1),  # 36 = 6*sqrt(1)
-}
+def _sqrt_sep(inside):
+    pfai = pf.prime_factorization(abs(inside))
+    if pfai is None:
+        return 1, inside
+    new_outside, new_inside = {}, {}
+    for prime, power in pfai.items():
+        new_outside[prime] = power // 2
+        new_inside[prime] = power % 2
+    n1p1 = _n1p1(inside < 0)
+    return pf.realize_int(new_outside), n1p1 * pf.realize_int(new_inside)
+
+
+def _n1p1(is_negative):
+    # Turns an "is negative" bool-ish value
+    # to either -1 or +1, as appropriate
+    return -1 if is_negative else 1
 
 
 def _move_squares_out(inside):
-    outside, new_inside = _SQRT_SEP.get(inside, (1, inside))
+    outside, new_inside = _sqrt_sep(inside)
     if outside == 1:
         return ('sqrt', inside)
     if new_inside == 1:
