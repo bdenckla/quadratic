@@ -16,6 +16,23 @@ def prime_factorization(n):
     return counter
 
 
+def realize(pf):
+    numerator = 1
+    denominator = 1
+    for prime, power in pf.items():
+        if power >= 0:
+            numerator *= prime ** power
+        else:
+            denominator *= prime ** (-power)
+    return numerator, denominator
+
+
+def subtract(pf1, pf2):
+    result = collections.Counter(pf1)
+    result.subtract(pf2)
+    return result
+
+
 _PRIMES = [2, 3, 5, 7, 11, 13, 17, 19, 23]
 
 
