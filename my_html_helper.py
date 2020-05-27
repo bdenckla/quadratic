@@ -1,3 +1,5 @@
+import os
+
 import my_discriminant
 import my_quadratic_roots
 import my_html
@@ -13,7 +15,17 @@ def _condense_steps(steps):  # remove no-ops
         last_body = body
     return new_steps
 
-def write_html_file_for_disc_and_qroots(a, b, c):
+
+def write_html_files(uu_file_uu, problems):
+    bnf = os.path.basename(uu_file_uu)
+    bnf_woe = os.path.splitext(bnf)[0]  # basename of __file__ without extension
+    # e.g. "foo" if filename is "foo.py"
+    assignment_name = bnf_woe
+    for i in range(len(problems)):
+        write_html_file_for_disc_and_qroots(*problems[i], i+1, assignment_name)
+
+
+def write_html_file_for_disc_and_qroots(a, b, c, problem_num=1, subdir='misc'):
     dsteps = my_discriminant.calc(a, b, c)
     disc_steps = _condense_steps(dsteps)
     last_disc_step = disc_steps[-1]
@@ -25,7 +37,7 @@ def write_html_file_for_disc_and_qroots(a, b, c):
         steps_for_roots[plmi] = _condense_steps(rsteps)
     #
     name = 'a={} b={} c={}'.format(a, b, c)
-    path = 'out/{}.html'.format(name)
+    path = 'out/{}/Problem {} -- {}.html'.format(subdir, problem_num, name)
     file_title = name
     calcs = (disc_steps, steps_for_roots['+'], steps_for_roots['-'])
     calc_titles = (

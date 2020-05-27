@@ -1,4 +1,5 @@
 import html
+import os
 
 
 def write_to_html(path, title, calcs, calc_titles):
@@ -7,6 +8,8 @@ def write_to_html(path, title, calcs, calc_titles):
 
 
 def _write_html_to_file(html_el, path):
+    dn_path = os.path.dirname(path)
+    os.makedirs(dn_path, exist_ok=True)
     with open(path, 'w', encoding='utf-8') as fh:
         fh.write('<!doctype html>\n')
         fh.write(_el_to_str(html_el))
@@ -15,7 +18,9 @@ def _write_html_to_file(html_el, path):
 def _html_el2(title_text, body_contents, lang='en', charset='utf-8'):
     meta = {'tag': 'meta', 'noclose': True}
     title = {'tag': 'title', 'contents': (title_text,)}
-    _head = {'tag': 'head', 'contents': (meta, title)}
+    mathjax_url = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-MML-AM_CHTML'
+    script = {'tag': 'script', 'attr': {'src': mathjax_url}}
+    _head = {'tag': 'head', 'contents': (meta, title, script)}
     _body = {'tag': 'body', 'contents': body_contents}
     return _html_el1({'lang': lang}, (_head, _body))
 
