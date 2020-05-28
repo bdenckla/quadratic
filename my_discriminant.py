@@ -35,6 +35,8 @@ def _n1p1(is_negative):
 
 
 def _move_squares_out(inside):
+    if inside == 0:
+        return 0
     outside, new_inside = _sqrt_sep(inside)
     if outside == 1:
         return ('sqrt', inside)
